@@ -54,7 +54,6 @@ app.get('/:user', function (req, res, next) {
           description: repo.component.description || repo.github.description
         }
       });
-      console.log(user);
       res.render('user', {
         title: user.login,
         components: repos,

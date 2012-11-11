@@ -1,9 +1,9 @@
 {
-  "name": "application-name",
-  "version": "0.0.1",
+  "name": "component",
+  "version": "0.0.1-3",
   "private": true,
   "scripts": {
-    "start": "node server"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "3.0.0",
@@ -11,6 +11,11 @@
     "request": "*",
     "marked": "~0.2.5",
     "q": "~0.8.10",
-    "component": "~0.9.0"
+    "component": "~0.9.0",
+    "highlight.js": "*"
+  },
+  "subdomain": "component-website",
+  "engines": {
+    "node": "0.8.x"
   }
 }

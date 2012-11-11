@@ -1,8 +1,8 @@
 var Q = require('q');
 var nbind = Q.nbind;
 
-var clientID;//set to github client id
-var clientSecret//set to github client secret
+var clientID = process.env.githubID;//set to github client id
+var clientSecret = process.env.githubSecret;//set to github client secret
 
 var dataCache = {};
 function cache(fn, name) {
@@ -11,13 +11,13 @@ function cache(fn, name) {
   var c = dataCache[name];
   return function (path) {
     if (arguments.length == 1 && typeof path == 'string') {
-      if (c[path]) console.log('serve from cache');
+      //if (c[path]) console.log('serve from cache');
       if (!c[path]) {
         setTimeout(function () {
           delete c[path];
         }, 120000);//clear cached results after 2 minutes.
       }
-      return c[path] ? c[path] : c[path] = fn(path + '?client_id=' + clientID + '&client_secret=' + clientSecret);
+      return c[path] ? c[path] : c[path] = fn(path + (path.indexOf('?') == -1 ? '?' : '&') + 'client_id=' + clientID + '&client_secret=' + clientSecret);
     }
   };
 }
@@ -93,7 +93,7 @@ module.exports.getUserRepos = getUserRepos;
 function getUserRepos(user) {
   var get = 0;
   var got = 0;
-  return getJson('https://api.github.com/users/' + user + '/repos')
+  return getJson('https://api.github.com/users/' + user + '/repos?per_page=100')
     .then(function (repos) {
       return Q.all(repos.map(attachComponent))
         .then(function (repos) {
