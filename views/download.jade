@@ -1,41 +1,54 @@
 extends layout
 
 block content
-  h1
-    a(href=readme)= title
+  header
+    div.content
+      h1
+        a(href='/' + user)= user
+        |/
+        a(href='/' + user + '/' + name)= name
+        br
+        | Downloads
+  section#menu
+    div.content
+      nav
   if versions && versions.length > 0
-    div
+    section.page
+      div.content
+        h2
+          | Current version(#{versions[0].version})
+        p
+          | This is the current stable release, it's generally recommended that you always use this.
+        a(href=versions[0].download)
+          | Full Download
+        |/
+        a(href=versions[0].downloadMin)
+          | Minified
+  section.page
+    div.content
       h2
-        | Current version(#{versions[0].version})
+        | Development Release
       p
-        | This is the current stable release, it's generally recommended that you always use this.
-      a(href=versions[0].download)
+        | This represents the current version in GitHub and may have errors, use at your own risk.
+      a(href=devRelease.download)
         | Full Download
       |/
-      a(href=versions[0].downloadMin)
+      a(href=devRelease.downloadMin)
         | Minified
-  div
-    h2
-      | Development Release
-    p
-      | This represents the current version in GitHub and may have errors, use at your own risk.
-    a(href=devRelease.download)
-      | Full Download
-    |/
-    a(href=devRelease.downloadMin)
-      | Minified
   if versions && versions.length > 0
-    h2
-      | Old Versions
-    p
-      | If there's a problem with the current realease, you can access past versions here.
-    each version in versions
-      if (version != versions[0])
-        div
-          | #{version.version}
-          | - 
-          a(href=version.download)
-            | Full Download
-          |/
-          a(href=version.downloadMin)
-            | Minified
+    section.page
+      div.content
+        h2
+          | Old Versions
+        p
+          | If there's a problem with the current realease, you can access past versions here.
+        each version in versions
+          if (version != versions[0])
+            div
+              | #{version.version}
+              | - 
+              a(href=version.download)
+                | Full Download
+              |/
+              a(href=version.downloadMin)
+                | Minified

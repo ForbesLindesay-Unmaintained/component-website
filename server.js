@@ -151,7 +151,8 @@ app.get('/:user/:repo/download', function (req, res, next) {
       res.render('download', {
         title: component.name,
         license: component.license || 'unspecified',
-        readme: '/' + user + '/' + repo,
+        user: user,
+        name: repo,
         devRelease: {
           download: '/' + user + '/' + repo + '/download/' + component.name + '-dev.js',
           downloadMin: '/' + user + '/' + repo + '/download/' + component.name + '-dev.min.js'
