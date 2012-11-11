@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  header
+    div.content
+      h1
+        a(href='/' + username)= username
+        |/#{title}
+      if travis
+        | !{travis}
+  section#menu.fix-when-top
+    div.content
+      nav
+        each heading in headings
+          a(href="#" + heading.id)= heading.text
+  section.page
+    div.content
+      | !{readme}
+  a(href=github)
+    img(style="position: absolute; z-index: 5; top: 0; left: 0; border: 0;", src="http://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png", alt="Fork me on GitHub")

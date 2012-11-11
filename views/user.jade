@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  header
+    div.content
+      img.avatarImage(src=user.avatar, align="left")
+      h1.avatarHeader=user.name
+  section#menu
+    div.content
+      nav
+        a(href=user.url) GitHub
+  each component in components
+    section.page
+      div.content
+        h2
+          a(href=component.url)=component.name
+        p=component.description
+      

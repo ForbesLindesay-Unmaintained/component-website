@@ -1,0 +1,7 @@
+{
+  "name": "componentWebsite",
+  "dependencies": {
+    "ForbesLindesay/booting-sub-nav": "*"
+  },
+  "scripts": ["index.js"]
+}
