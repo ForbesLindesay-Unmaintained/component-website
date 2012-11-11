@@ -3,26 +3,11 @@ var remote = 'https://raw.github.com';
 var express = require('express');
 var http = require('http');
 var path = require('path');
-var marked = require('marked');
-var hljs = require('highlight.js');
 
 var Q = require('q');
 var github = require('./github');
+var markdown = require('./markdown');
 var componentLib = require('component');
-
-marked.setOptions({
-  gfm: true,
-  pedantic: false,
-  sanitize: false,
-  highlight: function(code, lang) {
-    if (lang) {
-      try {
-        return hljs.highlight(lang.toLowerCase(), code).value;
-      } catch (ex) {}
-    }
-    return code;
-  }
-});
 
 var app = express();
 
@@ -38,11 +23,6 @@ app.configure(function(){
 app.configure('development', function(){
   app.use(express.errorHandler());
 });
-
-var travisRegex = /^\[\!\[Build Status\]\([^\)]+\)\]\([^\)]+\)\n?$/;
-function makeHeadingID(text) {
-  return text.toLowerCase().replace(/ /g, '-').replace(/[^\-\w]/g, '');
-}
 
 app.get('/:user', function (req, res, next) {
   Q.all([github.getUser(req.params.user), github.getUserRepos(req.params.user)])
@@ -74,59 +54,10 @@ app.get('/:user/:repo', function (req, res, next) {
       if (!component) return next();
       readme = readme || 'no readme found at "readme.md"';
 
-      var travis = false;
-      var tokens = marked.lexer(readme);
-      //todo: build ToC etc.
-      tokens = tokens.filter(function (token) {
-        if (token.type == 'paragraph' && travisRegex.test(token.text)) {
-          travis = marked(token.text).replace(/\<p\>/g, '<div class="travis-status">').replace(/\<\/p\>/g, '</div>');
-          return false;
-        }
-        return token.type != 'heading' || token.depth != 1;
-      })
-      var newTokens = [];
-      var first = true;
-      var headings = [];
-      tokens.forEach(function (token) {
-        if (token.type == 'heading' && token.depth == 2 && !first) {
-          newTokens.push({
-            type: 'html',
-            pre: true,
-            text: '</div></section><section class="page"><div class="content">'
-          });
-        } else if (first && token.type != 'heading') {
-          headings.push({id: 'introduction', text: 'Introduction', children: []});
-          newTokens.push({
-            type: 'html',
-            pre: true,
-            text: '<a id="introduction" style="margin-bottom:60px; display: block;"></a>'
-          });
-          newTokens.push({
-            type: 'heading',
-            depth: 2,
-            text: 'Introduction'
-          });
-        }
-        if (token.type == 'heading') {
-          if (token.depth == 2) {
-            headings.push({id: makeHeadingID(token.text), text: token.text, children: []});
-          } else if (token.depth == 3 && headings.length) {
-            headings[headings.length - 1].children.push({id: makeHeadingID(token.text), text: token.text});
-          }
-          if (token.depth == 2 || token.depth == 3) {
-            newTokens.push({
-              type: 'html',
-              pre: true,
-              text: '<a id="' + makeHeadingID(token.text) + '" style="margin-bottom:40px; display: block;"></a>'
-            });
-          }
-        }
-        first = false;
-        newTokens.push(token);
-      });
-      tokens = newTokens;
-
-      var html = marked.parser(tokens);
+      var parsed = markdown(readme);
+      var travis = parsed.travis;
+      var headings = parsed.headings;
+      var html = parsed.html;
 
       res.render('component', {
         title: component.name,
@@ -154,14 +85,14 @@ app.get('/:user/:repo/download', function (req, res, next) {
         user: user,
         name: repo,
         devRelease: {
-          download: '/' + user + '/' + repo + '/download/' + component.name + '-dev.js',
-          downloadMin: '/' + user + '/' + repo + '/download/' + component.name + '-dev.min.js'
+          download: '/' + user + '/' + repo + '/download/' + component.name.replace('.js', '') + '-dev.js',
+          downloadMin: '/' + user + '/' + repo + '/download/' + component.name.replace('.js', '') + '-dev.min.js'
         },
         versions: tags ? tags.map(function (tag) {
           return {
             version: tag.version,
-            download: '/' + user + '/' + repo + '/download/' + component.name + '-' + tag.version + '.js',
-            downloadMin: '/' + user + '/' + repo + '/download/' + component.name + '-' + tag.version + '.min.js'
+            download: '/' + user + '/' + repo + '/download/' + component.name.replace('.js', '') + '-' + tag.version + '.js',
+            downloadMin: '/' + user + '/' + repo + '/download/' + component.name.replace('.js', '') + '-' + tag.version + '.min.js'
           }
         }) : []
       })
