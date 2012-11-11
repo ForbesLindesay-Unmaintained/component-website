@@ -157,13 +157,13 @@ app.get('/:user/:repo/download', function (req, res, next) {
           download: '/' + user + '/' + repo + '/download/' + component.name + '-dev.js',
           downloadMin: '/' + user + '/' + repo + '/download/' + component.name + '-dev.min.js'
         },
-        versions: tags.map(function (tag) {
+        versions: tags ? tags.map(function (tag) {
           return {
             version: tag.version,
             download: '/' + user + '/' + repo + '/download/' + component.name + '-' + tag.version + '.js',
             downloadMin: '/' + user + '/' + repo + '/download/' + component.name + '-' + tag.version + '.min.js'
           }
-        })
+        }) : []
       })
     })
     .done(null, next);
