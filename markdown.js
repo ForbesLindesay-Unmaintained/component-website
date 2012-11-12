@@ -72,7 +72,6 @@ function parse(markdown) {
     first = false;
     newTokens.push(token);
   });
-  console.log(tokens.links);
   tokens = newTokens;
   tokens.links = links;
 
