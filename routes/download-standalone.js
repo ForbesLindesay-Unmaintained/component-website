@@ -3,6 +3,7 @@ var Q = require('q');
 var github = require('../github');
 var componentInstall = require('../component-download');
 var componentBuild = require('../component-build');
+var cache = require('../promise-cache');
 
 var UglifyJS = require('uglify-js2');
 
@@ -22,10 +23,6 @@ var exists = function (path) {
 
 var path = require('path');
 var join = path.join;
-
-function bin(path) {
-  return 'node ' + join(__dirname, '..', 'node_modules', 'component', 'bin', path);
-}
 
 function makedir(path) {
   return exists(path)
@@ -74,17 +71,6 @@ function removedir(path) {
   }
 }
 
-function readJSON(path) {
-  return readFile(path)
-    .then(function (content) {
-      return JSON.parse(content.toString());
-    });
-}
-
-function camelCase(name) {
-  return name.replace(/\-(\w)/g, function (_, c) { return c.toUpperCase(); });
-}
-
 
 function installComponent(user, repo, version) {
   return componentInstall(user + '/' + repo, version, join(__dirname, '..', 'cache', user, repo, version));
@@ -92,10 +78,12 @@ function installComponent(user, repo, version) {
 
 function buildComponent(user, repo, version) {
   var dir = join(__dirname, '..', 'cache', user, repo, version);
-  return componentBuild(dir, repo)
-    .then(function () {
-      return readFile(join(dir, 'build', 'build.js'))
-    })
+  return componentBuild(dir, repo);
+}
+
+function minifyComponent(user, repo, version) {
+  var dir = join(__dirname, '..', 'cache', user, repo, version);
+  return readFile(join(dir, 'build', 'build.js'))
     .then(function (built) {
       return writeFile(join(dir, 'build', 'build.min.js'), UglifyJS.minify(built.toString(), {fromString: true}).code);
     });
@@ -103,9 +91,7 @@ function buildComponent(user, repo, version) {
 
 // `/:user/:repo/download/:file.js`
 
-removedir(join(__dirname, '..', 'cache'));
-var cache = {};
-var clearing = {};
+removedir(join(__dirname, '..', 'cache')).done();
 module.exports = route;
 function route(req, res, next) {
   var user = req.params.user;
@@ -143,56 +129,30 @@ function route(req, res, next) {
   ver.then(function (version) {
     var dir = join(__dirname, '..', 'cache', user, repo, version);
 
-    var fileBuilt;
-    if (cache[user + '/' + repo + '/' + version]) {
-      console.log('using cache');
-      fileBuilt = cache[user + '/' + repo + '/' + version];
-    } else {
-      console.log('building cache');
-      fileBuilt = cache[user + '/' + repo + '/' + version] = (function () {
-        var dirCreated;
-        if (version === 'dev') {
-          dirCreated = removedir(dir)
-            .then(function () {
-              return makedir(dir);
-            });
-        } else {
-          dirCreated = makedir(dir);
-        }
+    var build = cache(user + '/' + repo + '/' + version, 30000, function () {
+      var ready = (version == 'dev' ? removedir(dir) : Q.resolve(null));
 
-        return dirCreated
-          .then(function (isNew) {
-            if (isNew) {
-              return installComponent(user, repo, version)
-                .then(function () {
-                  return buildComponent(user, repo, version);
-                });
-            }
-          });
-      }());
-
-      fileBuilt
+      return ready
         .then(function () {
-          return Q.delay(30000);
-        },
-        function () {
-          return removedir(dir);
+          return makedir(dir);
         })
-        .then(function () {
-          console.log('clearing cache');
-          delete cache[user + '/' + repo + '/' + version];
-          if (version == 'dev') {
-            var remove = clearing[user + '/' + repo + '/' + version] = removedir(dir);
-            return remove.then(function () {
-              delete clearing[user + '/' + repo + '/' + version];
-            })
+        .then(function (isNew) {
+          if (isNew) {
+            return installComponent(user, repo, version)
+              .then(function () {
+                return buildComponent(user, repo, version);
+              })
+              .then(function () {
+                return minifyComponent(user, repo, version);
+              });
           }
-        })
-        .done();
-    }
+        });
+      }, function reset(err) {
+        if (err || version == 'dev')
+          return removedir(dir);
+      });
 
-    return fileBuilt
-      .then(function () {
+    return build.then(function () {
         res.sendfile(join(dir, 'build', 'build' + (min?'.min':'')+ '.js'), {maxAge: 0});
       })
 
