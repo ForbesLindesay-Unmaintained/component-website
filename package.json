@@ -1,6 +1,6 @@
 {
   "name": "component",
-  "version": "0.0.1-28",
+  "version": "0.0.1-29",
   "private": true,
   "scripts": {
     "start": "node server.js"
@@ -16,7 +16,7 @@
     "uglify-js2": "~2",
     "component-builder": "~0.4"
   },
-  "subdomain": "component-website",
+  "subdomain": "component",
   "engines": {
     "node": "0.8.x"
   }
