@@ -13,17 +13,11 @@ var exists = function (path) {
   return def.promise;
 }
 
-function readJSON(file) {
-  return Q.nbind(fs.readFile, fs)(file)
-    .then(function (contents) {
-      return JSON.parse(contents);
-    });
-}
 function camelCase(name) {
   return name.replace(/\-(\w)/g, function (_, c) { return c.toUpperCase(); });
 }
 
-function build(dir, standalone) {
+function build(dir, name) {
   return exists(path.join(dir, 'build'))
     .then(function (exists) {
       if (!exists) return mkdir(path.join(dir, 'build'));
@@ -31,9 +25,9 @@ function build(dir, standalone) {
     .then(function () {
       var builder = new Builder(dir);
       builder.paths = [join(dir, 'components')];
-      return Q.all([Q.nbind(builder.build, builder)(), readJSON(join(dir, 'component.json'))]);
+      return Q.nbind(builder.build, builder)();
     })
-    .spread(function (obj, json) {
+    .then(function (obj) {
       var outstanding = 2;
       var def = Q.defer();
       function complete() {
@@ -56,16 +50,15 @@ function build(dir, standalone) {
       js.write(';(function(){\n');
       js.write(obj.require);
       js.write(obj.js);
-      var lib = 'require("' + json.name + '")';
-      var standalone = json.standalone || camelCase(json.name);
+      var lib = 'require("' + name + '")';
       js.write('if (typeof module != "undefined" && typeof module.exports != "undefined") {\n');
       js.write('  module.exports = ' + lib + '\n');
       js.write('} else if (typeof define == "function") {\n');
-      js.write('  define("' + json.name + '", [], function () {\n');
+      js.write('  define("' + name + '", [], function () {\n');
       js.write('    return ' + lib + '\n');
       js.write('  });')
       js.write('} else {\n');
-      js.write('  window.' + standalone + ' = ' + lib + '\n');
+      js.write('  window.' + camelCase(name) + ' = ' + lib + '\n');
       js.write('}\n');
       js.write('}())');
       js.end();

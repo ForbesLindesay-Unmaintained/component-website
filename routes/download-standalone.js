@@ -92,7 +92,7 @@ function installComponent(user, repo, version) {
 
 function buildComponent(user, repo, version) {
   var dir = join(__dirname, '..', 'cache', user, repo, version);
-  return componentBuild(dir)
+  return componentBuild(dir, repo)
     .then(function () {
       return readFile(join(dir, 'build', 'build.js'))
     })
@@ -164,9 +164,6 @@ function route(req, res, next) {
           .then(function (isNew) {
             if (isNew) {
               return installComponent(user, repo, version)
-                .then(function () {
-                  //return Q.delay(30000);
-                })
                 .then(function () {
                   return buildComponent(user, repo, version);
                 });
