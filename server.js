@@ -19,6 +19,7 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
+app.get('/', require('./routes/index'));
 app.get('/:user', require('./routes/user'));
 app.get('/:user/:repo', require('./routes/repo'));
 app.get('/:user/:repo/download', require('./routes/download-listing'));

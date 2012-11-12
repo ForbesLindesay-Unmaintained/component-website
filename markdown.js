@@ -24,6 +24,7 @@ module.exports = parse;
 function parse(markdown) {
   var travis = false;
   var tokens = marked.lexer(markdown);
+  var links = tokens.links;
   tokens = tokens.filter(function (token) {
     if (token.type == 'paragraph' && travisRegex.test(token.text)) {
       travis = marked(token.text).replace(/\<p\>/g, '<div class="travis-status">').replace(/\<\/p\>/g, '</div>');
@@ -71,7 +72,9 @@ function parse(markdown) {
     first = false;
     newTokens.push(token);
   });
+  console.log(tokens.links);
   tokens = newTokens;
+  tokens.links = links;
 
   var html = marked.parser(tokens);
 
