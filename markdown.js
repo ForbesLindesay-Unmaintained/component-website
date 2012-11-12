@@ -29,9 +29,27 @@ function parse(markdown) {
     if (token.type == 'paragraph' && travisRegex.test(token.text)) {
       travis = marked(token.text).replace(/\<p\>/g, '<div class="travis-status">').replace(/\<\/p\>/g, '</div>');
       return false;
+    } else {
+      return true;
     }
-    return token.type != 'heading' || token.depth != 1;
-  })
+  });
+  if (tokens[0].type == 'heading' && tokens[0].depth == 1) {
+    tokens.shift();
+  }
+
+  var higherHeadings = tokens.some(function (token) {
+    if (token.type == 'heading' && token.depth < 2) {
+      return true;
+    }
+  });
+  if (higherHeadings) { //fix multiple h1s
+    tokens.forEach(function (token) {
+      if (token.type == 'heading') {
+        token.depth++;
+      }
+    });
+  }
+
   var newTokens = [];
   var first = true;
   var headings = [];
