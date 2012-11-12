@@ -1,6 +1,8 @@
 var Q = require('q');
 
 var github = require('../github');
+var componentInstall = require('../component-download');
+var componentBuild = require('../component-build');
 
 var UglifyJS = require('uglify-js2');
 
@@ -20,15 +22,6 @@ var exists = function (path) {
 
 var path = require('path');
 var join = path.join;
-
-var exec = function (path, options) {
-  console.log('executing ' + path);
-  return Q.nbind(require('child_process').exec)(path, options)
-    .fail(function (ex) {
-      if (ex.message) console.log('exec failure: ' + ex.message);
-      else console.log('exec failure: ' + ex);
-    });
-}
 
 function bin(path) {
   return 'node ' + join(__dirname, '..', 'node_modules', 'component', 'bin', path);
@@ -90,6 +83,22 @@ function readJSON(path) {
 
 function camelCase(name) {
   return name.replace(/\-(\w)/g, function (_, c) { return c.toUpperCase(); });
+}
+
+
+function installComponent(user, repo, version) {
+  return componentInstall(user + '/' + repo, version, join(__dirname, '..', 'cache', user, repo, version));
+}
+
+function buildComponent(user, repo, version) {
+  var dir = join(__dirname, '..', 'cache', user, repo, version);
+  return componentBuild(dir)
+    .then(function () {
+      return readFile(join(dir, 'build', 'build.js'))
+    })
+    .then(function (built) {
+      return writeFile(join(dir, 'build', 'build.min.js'), UglifyJS.minify(built.toString(), {fromString: true}).code);
+    });
 }
 
 // `/:user/:repo/download/:file.js`
@@ -154,22 +163,12 @@ function route(req, res, next) {
         return dirCreated
           .then(function (isNew) {
             if (isNew) {
-              console.log('installing component: ' + dir);
-              return exec(bin('component-install') + ' ' + user + '/' + repo + (version === 'dev'?'':'@' + version), 
-                  {cwd: dir, timeout: 10000})
+              return installComponent(user, repo, version)
                 .then(function () {
-                  return readJSON(join(dir, 'components', user + '-' + repo, 'component.json'));
-                })
-                .then(function (component) {
-                  console.log('building component');
-                  return exec(bin('component-build') + ' -s ' + (component.standalone || camelCase(repo.replace('.js', ''))),
-                    {cwd: join(dir, 'components', user + '-' + repo), timeout: 2000});
+                  //return Q.delay(30000);
                 })
                 .then(function () {
-                  return readFile(join(dir, 'components', user + '-' + repo, 'build', 'build.js'))
-                })
-                .then(function (built) {
-                  return writeFile(join(dir, 'components', user + '-' + repo, 'build', 'build.min.js'), UglifyJS.minify(built.toString(), {fromString: true}).code);
+                  return buildComponent(user, repo, version);
                 });
             }
           });
@@ -197,7 +196,7 @@ function route(req, res, next) {
 
     return fileBuilt
       .then(function () {
-        res.sendfile(join(dir, 'components', user + '-' + repo, 'build', 'build' + (min?'.min':'')+ '.js'), {maxAge: 0});
+        res.sendfile(join(dir, 'build', 'build' + (min?'.min':'')+ '.js'), {maxAge: 0});
       })
 
   }).done(null, next);
