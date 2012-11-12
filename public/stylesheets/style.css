@@ -18,6 +18,9 @@ a:hover {
 }
 
 
+pre code {
+  overflow-x: auto;
+}
 
 html { margin: 0 }
 body {
