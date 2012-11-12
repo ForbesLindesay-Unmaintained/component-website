@@ -8,7 +8,7 @@ function latest(min) {
   return function (req, res, next) {
     var user = req.params.user;
     var repo = req.params.repo;
-    github.getTags()
+    github.getTags(user, repo)
       .then(function (tags) {
         var version;
         if (tags && tags.length) {

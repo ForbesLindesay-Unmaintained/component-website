@@ -26,26 +26,7 @@ app.get('/:user/:repo/download', require('./routes/download-listing'));
 app.get('/:user/:repo/download/latest.js', require('./routes/latest')(false));
 app.get('/:user/:repo/download/latest.min.js', require('./routes/latest')(true));
 
-app.get('/:user/:repo/download/:file.js', function (req, res, next) {
-  var user = req.params.user;
-  var repo = req.params.repo;
-  var file = req.params.file;
-
-  var min = /\.min$/.test(file);
-  if (min) file = file.substring(0, file.length - 4);
-
-  var match = /^(.*)\-([^\-]*)$/.exec(file);
-  if (!match) return next();
-  file = match[1];
-
-  var version = match[2];
-
-  //todo: install component user/repo@version
-  //todo: output standalone as /user/repo/download/file-version.js
-  //todo: minify result to     /user/repo/download/file-version.min.js
-
-  next();
-});
+app.get('/:user/:repo/download/:file.js', require('./routes/download-standalone'));
 
 
 

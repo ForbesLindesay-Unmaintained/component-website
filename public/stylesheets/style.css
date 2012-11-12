@@ -184,3 +184,16 @@ nav a:hover, #dropdown li:hover {
 .page:nth-child(4n){
   background-color: #79C3D2;
 }
+
+.downloads h2 {
+  margin-bottom: 5px;
+}
+.downloads {
+  float: right;
+}
+.float-left {
+  float: left;
+}
+header {
+  height: 150px;
+}

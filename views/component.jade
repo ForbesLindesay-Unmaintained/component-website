@@ -3,11 +3,20 @@ extends layout
 block content
   header
     div.content
-      h1
-        a(href='/' + username)= username
-        |/#{title}
-      if travis
-        | !{travis}
+      div.float-left
+        h1
+          a(href='/' + username)= username
+          |/#{title}
+        if travis
+          | !{travis}
+      div.downloads
+        h2 Download
+        | Latest: 
+        a(href='/' + username + '/' + title + '/download/latest.js') Full
+        |  / 
+        a(href='/' + username + '/' + title + '/download/latest.min.js') Minified
+        br
+        a(href='/' + username + '/' + title + '/download') All Versions
   section#menu.fix-when-top
     div.content
       nav
