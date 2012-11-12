@@ -120,12 +120,6 @@ function route(req, res, next) {
   } else {
     ver = Q.resolve(version);
   }
-  if (clearing[user + '/' + repo + '/' + version]) {
-    ver = ver.then(function (version) {
-      return clearing[user + '/' + repo + '/' + version]
-        .then(function () { return version; });
-      });
-  }
   ver.then(function (version) {
     var dir = join(__dirname, '..', 'cache', user, repo, version);
 

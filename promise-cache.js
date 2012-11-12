@@ -1,13 +1,14 @@
 var Q = require('q');
 var cache = {};
 var hold = {};
-function cache(name, time, fn, reset) {
+module.exports = cacheFn;
+function cacheFn(name, time, fn, reset) {
   if (cache[name]) {
     return cache[name];
   } else {
     if (hold[name]) {
       return Q.when(hold[name], function () {
-        return cache(name, time, fn, reset);
+        return cacheFn(name, time, fn, reset);
       });
     }
     cache[name] = fn();
