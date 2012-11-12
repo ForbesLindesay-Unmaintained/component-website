@@ -94,6 +94,7 @@ function camelCase(name) {
 
 // `/:user/:repo/download/:file.js`
 
+removedir(join(__dirname, '..', 'cache'));
 var cache = {};
 var clearing = {};
 module.exports = route;
@@ -155,7 +156,7 @@ function route(req, res, next) {
             if (isNew) {
               console.log('installing component: ' + dir);
               return exec(bin('component-install') + ' ' + user + '/' + repo + (version === 'dev'?'':'@' + version), 
-                  {cwd: dir, timeout: 3000})
+                  {cwd: dir, timeout: 10000})
                 .then(function () {
                   return readJSON(join(dir, 'components', user + '-' + repo, 'component.json'));
                 })
@@ -174,9 +175,12 @@ function route(req, res, next) {
           });
       }());
 
-      fileBuilt.fail(function () {})
+      fileBuilt
         .then(function () {
           return Q.delay(30000);
+        },
+        function () {
+          return removedir(dir);
         })
         .then(function () {
           console.log('clearing cache');
