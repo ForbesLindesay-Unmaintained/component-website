@@ -21,7 +21,14 @@ var exists = function (path) {
 var path = require('path');
 var join = path.join;
 
-var exec = Q.nbind(require('child_process').exec);
+var exec = function (path, options) {
+  console.log('executing ' + path);
+  return Q.nbind(require('child_process').exec)(path, options)
+    .fail(function (ex) {
+      if (ex.message) console.log('exec failure: ' + ex.message);
+      else console.log('exec failure: ' + ex);
+    });
+}
 
 function bin(path) {
   return 'node ' + join(__dirname, '..', 'node_modules', 'component', 'bin', path);
@@ -146,12 +153,16 @@ function route(req, res, next) {
         return dirCreated
           .then(function (isNew) {
             if (isNew) {
-              return exec(bin('component-install') + ' ' + user + '/' + repo + (version === 'dev'?'':'@' + version), {cwd: dir})
+              console.log('installing component: ' + dir);
+              return exec(bin('component-install') + ' ' + user + '/' + repo + (version === 'dev'?'':'@' + version), 
+                  {cwd: dir, timeout: 3000})
                 .then(function () {
                   return readJSON(join(dir, 'components', user + '-' + repo, 'component.json'));
                 })
                 .then(function (component) {
-                  return exec(bin('component-build') + ' -s ' + (component.standalone || camelCase(repo.replace('.js', ''))), {cwd: join(dir, 'components', user + '-' + repo)});
+                  console.log('building component');
+                  return exec(bin('component-build') + ' -s ' + (component.standalone || camelCase(repo.replace('.js', ''))),
+                    {cwd: join(dir, 'components', user + '-' + repo), timeout: 2000});
                 })
                 .then(function () {
                   return readFile(join(dir, 'components', user + '-' + repo, 'build', 'build.js'))
@@ -182,7 +193,7 @@ function route(req, res, next) {
 
     return fileBuilt
       .then(function () {
-        res.sendfile(join(dir, 'components', user + '-' + repo, 'build', 'build' + (min?'.min':'')+ '.js'), {maxAge: 0})
+        res.sendfile(join(dir, 'components', user + '-' + repo, 'build', 'build' + (min?'.min':'')+ '.js'), {maxAge: 0});
       })
 
   }).done(null, next);
