@@ -1,12 +1,18 @@
 var marked = require('marked');
 var hljs = require('highlight.js');
 
+var aliases = {
+  js: 'javascript'
+}
+
 marked.setOptions({
   gfm: true,
   pedantic: false,
   sanitize: false,
   highlight: function(code, lang) {
     if (lang) {
+      lang = lang.toLowerCase();
+      lang = aliases[lang] || lang;
       try {
         return hljs.highlight(lang.toLowerCase(), code).value;
       } catch (ex) {}
@@ -14,6 +20,7 @@ marked.setOptions({
     return code;
   }
 });
+
 
 var travisRegex = /^\[\!\[Build Status\]\([^\)]+\)\]\([^\)]+\)\n?$/;
 function makeHeadingID(text) {
