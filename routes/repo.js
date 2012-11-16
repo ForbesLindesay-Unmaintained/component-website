@@ -14,6 +14,13 @@ function route(req, res, next) {
       if (!component) return next();
       readme = readme || 'no readme found at "readme.md"';
 
+      if (component.dependencies && Object.keys(component.dependencies).length) {
+        readme += '\n\n## Dependencies\n\n' + Object.keys(component.dependencies)
+          .map(function (dependency) {
+            return ' - [' + dependency + '](/' + dependency + ')';
+          }).join('\n');
+      }
+
       var parsed = markdown(readme);
       var travis = parsed.travis;
       var headings = parsed.headings;
