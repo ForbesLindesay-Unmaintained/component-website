@@ -23,8 +23,11 @@ marked.setOptions({
 
 
 var travisRegex = /^\[\!\[Build Status\]\([^\)]+\)\]\([^\)]+\)\n?$/;
+function filterHeadingText(text) {
+  return marked(text).replace(/\<[^\>]+\>/g, '');
+}
 function makeHeadingID(text) {
-  return text.toLowerCase().replace(/ /g, '-').replace(/[^\-\w]/g, '');
+  return filterHeadingText(text).toLowerCase().replace(/ /g, '-').replace(/[^\-\w]/g, '');
 }
 
 module.exports = parse;
@@ -82,9 +85,9 @@ function parse(markdown) {
     }
     if (token.type == 'heading') {
       if (token.depth == 2) {
-        headings.push({id: makeHeadingID(token.text), text: token.text, children: []});
+        headings.push({id: makeHeadingID(token.text), text: filterHeadingText(token.text), children: []});
       } else if (token.depth == 3 && headings.length) {
-        headings[headings.length - 1].children.push({id: makeHeadingID(token.text), text: token.text});
+        headings[headings.length - 1].children.push({id: makeHeadingID(token.text), text: filterHeadingText(token.text)});
       }
       if (token.depth == 2 || token.depth == 3) {
         newTokens.push({
@@ -101,6 +104,13 @@ function parse(markdown) {
   tokens.links = links;
 
   var html = marked.parser(tokens);
+
+
+  headings.width = headings.map(function (heading) {
+    return heading.text.length * 13 + 30 + 4;//text width + margin + border
+  }).reduce(function (a, b) {
+    return a + b;
+  });
 
   return {html: html, headings: headings, travis: travis};
 }

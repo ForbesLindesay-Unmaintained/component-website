@@ -20,8 +20,18 @@ block content
   section#menu.fix-when-top
     div.content
       nav
-        each heading in headings
-          a(href="#" + heading.id)= heading.text
+        if headings.width < 970
+          each heading in headings
+            a(href="#" + heading.id)= heading.text
+  if headings.width >= 970
+    section.page
+      div.content
+        h2
+          | Table of Contents
+        ul
+          each heading in headings
+            li
+              a(href="#" + heading.id)= heading.text
   section.page
     div.content
       | !{readme}
