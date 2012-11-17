@@ -15,10 +15,13 @@ function route(req, res, next) {
       readme = readme || 'no readme found at "readme.md"';
 
       if (component.dependencies && Object.keys(component.dependencies).length) {
-        readme += '\n\n## Dependencies\n\n' + Object.keys(component.dependencies)
+
+        readme += '\n\n' + (markdown.headingLevels(readme) == 1 ? '#' : '##') + ' Dependencies\n\n' + 
+        Object.keys(component.dependencies)
           .map(function (dependency) {
             return ' - [' + dependency + '](/' + dependency + ')';
-          }).join('\n');
+          })
+          .join('\n');
       }
 
       var parsed = markdown(readme);

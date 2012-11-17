@@ -114,3 +114,15 @@ function parse(markdown) {
 
   return {html: html, headings: headings, travis: travis};
 }
+
+module.exports.headingLevels = headingLevels;
+function headingLevels(markdown) {
+  var tokens = marked.lexer(markdown);
+  var title = false;
+  return tokens.some(function (token) {
+    if (token.type == 'heading' && token.depth < 2) {
+      if (title) return true;
+      else title = true;
+    }
+  }) ? 1 : 2;
+}
