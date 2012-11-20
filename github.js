@@ -31,10 +31,30 @@ function getJson(path) {
       } else if (res.statusCode != 200) {
         throw new Error('Server responded with error code: ' + res.statusCode + '\n' + body);
       } else {
-        return JSON.parse(body);
+        var result = JSON.parse(body);
+        if (res.headers.link) {
+          var links = parseLink(res.headers.link);
+          if (links.next) {
+            return getJson(links.next)
+              .then(function (rest) {
+                return result.concat(rest);
+              });
+          }
+        }
+        return result;
       }
     });
 };
+
+function parseLink(link) {
+  var regex = /\<([^\>]+)\>\; rel=\"([^\"]+)\"/g;
+  var links = {};
+  var current;
+  while (current = regex.exec(link)) {
+    links[current[2]] = current[1];
+  }
+  return links;
+}
 
 module.exports.getComponent = getComponent;
 function getComponent(user, repo) {
