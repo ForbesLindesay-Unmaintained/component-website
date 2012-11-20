@@ -2,17 +2,20 @@ var Q = require('q');
 var request = Q.nbind(require('request'));
 var markdown = require('./markdown');
 
-var cache = false;
+var cache = loadWiki();
 
-module.exports = loadWiki;
+setInterval(function () {
+  var next = loadWiki();
+  next.then(function () {
+    cache = next;
+  });
+}, 15 * 60 * 1000);
+
+module.exports = function () {
+  return cache;
+};
 function loadWiki() {
-  if (cache) {
-    return cache;
-  }
-  setTimeout(function () {
-    cache = false;
-  }, 5 * 60 * 1000);
-  return cache = request('https://github.com/component/component/wiki/Components')
+  return request('https://github.com/component/component/wiki/Components')
     .then(function (data) {
       data = data.toString().replace(/\r?\n/g, '');
       data = data.substring(data.indexOf('<div class="markdown-body">') + '<div class="markdown-body">'.length);

@@ -5,16 +5,50 @@ var github = require('../github');
 
 module.exports = route;
 function route(req, res, next) {
-  Q.all([github.getUser(req.params.user), github.getUserRepos(req.params.user)])
+  getUserCached(req.params.user)
+    .then(function (user) {
+      res.render('user', user);
+    }).done(null, next);
+}
+
+var cachAccessed = {};
+var cache = {};
+
+function getUserCached(user) {
+  if (cache[user]) {
+    cachAccessed[user] = true;
+    return cache[user];
+  } else {
+    updateCache();
+    return cache[user] = getUser(user);
+  }
+  function updateCache() {
+    cachAccessed[user] = false;
+    setTimeout(function () {
+      if (cachAccessed[user]) {
+        //refresh cache
+        var next = getUser(user);
+        next.then(function () {
+          cache[user] = next;
+        });
+        updateCache();
+      } else {
+        delete cache[user];
+      }
+    }, 1 * 60 * 1000);
+  }
+}
+function getUser(user) {
+  return Q.all([github.getUser(user), github.getUserRepos(user)])
     .spread(function (user, repos) {
       repos = repos.map(function (repo) {
         return {
           name: repo.github.full_name,
           url: '/' + repo.github.full_name,
-          description: repo.component.description || repo.github.description
+          description: repo.component.description || repo.github.description || ''
         }
       });
-      res.render('user', {
+      return {
         title: user.login,
         components: repos,
         user: {
@@ -22,6 +56,6 @@ function route(req, res, next) {
           avatar: user.avatar_url,
           url: user.html_url
         }
-      });
-    }).done(null, next);
+      };
+    });
 }
