@@ -14,7 +14,8 @@ var exists = function (path) {
 }
 
 function camelCase(name) {
-  return name.replace(/\-(\w)/g, function (_, c) { return c.toUpperCase(); });
+  return name.replace(/\-(\w)/g, function (_, c) { return c.toUpperCase(); })
+             .replace(/\.js$/, '');
 }
 
 function build(dir, name) {
