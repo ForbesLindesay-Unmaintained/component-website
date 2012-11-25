@@ -17,13 +17,16 @@ block content
         a(href='/' + username + '/' + title + '/download/latest.min.js') Minified
         br
         a(href='/' + username + '/' + title + '/download') All Versions
-  section#menu.fix-when-top
-    div.content
-      nav
-        if headings.width < 970
+  if headings.width < 970
+    section#menu.fix-when-top
+      div.content
+        nav
           each heading in headings
             a(href="#" + heading.id)= heading.text
-  if headings.width >= 970
+  else
+    section#menu
+      div.content
+        nav
     section.page
       div.content
         h2
