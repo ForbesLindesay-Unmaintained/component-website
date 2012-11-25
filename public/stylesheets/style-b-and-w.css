@@ -1,0 +1,152 @@
+body {
+  font: 14px Helvetica, arial, freesans, clean, sans-serif;
+  background-color: #4D4D4D;
+}
+
+a {
+  color: #777;
+  text-decoration: none;
+}
+h1>a {
+  color: black;
+}
+h2>a {
+  color: black;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+
+pre code {
+  overflow-x: auto;
+}
+
+html { margin: 0 }
+body {
+  margin: 0 auto;
+  font-size: 100%;
+  overflow-x: hidden;
+}
+nav, header, footer, section, article {
+  display: block;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: normal;
+}
+
+header {
+  padding-top: 150px;
+  padding-bottom: 20px;
+  background-color: white;
+}
+.avatarImage {
+  margin-right: 20px;
+  padding: 5px;
+  background: white;
+}
+.avatarHeader {
+  margin-bottom: 60px;
+}
+.travis-status {
+  margin-top: 20px;
+}
+.travis-status a {
+  color: transparent; /* keep ie happy */
+}
+
+#menu {
+  position: absolute;
+  width: 100%;
+  z-index: 3;
+  clear: both;
+  display: block;
+  background-color: white;
+  height: 42px;
+  border-bottom: 2px solid black;
+  border-top: 2px solid black;
+}
+nav a, #dropdown li {
+  color: black;
+  display: inline-block;
+  line-height: 42px;
+  margin: 0;
+  padding: 0px 15px;
+  text-decoration: none;
+  border: 2px solid transparent;
+  border-width: 0 2px;
+}
+nav a:hover, #dropdown li:hover {
+  background-color: black;
+  color: white;
+  text-decoration: none;
+}
+
+#menu.fixed-top {
+  position: fixed;
+  top: 0;
+  background-color: rgba(255, 255, 255, 0.6);
+  border-top: 0px;
+}
+#menu.fixed-top:hover {
+  background-color: white;
+}
+
+.content {
+  margin: 0 auto;
+  width: 980px;
+}
+
+.page {
+  margin: 0 auto;
+  font-size: 18px;
+  line-height: 26px;
+  padding: 0 60px;
+  background-color: white;
+}
+  .page .content {
+    width: 870px;
+    padding: 10px 45px;
+  }
+  .page h1 {
+    text-align: left;
+    font-size: 40px;
+    margin-top: 15px;
+    margin-bottom: 35px;
+  }
+  .page p + h1 { margin-top: 60px }
+  .page h3 {
+    margin: 30px 0 15px 0;
+  }
+  .page h2 {
+    margin: 50px 0 15px 0;
+  }
+  .page p + h2 {
+    border-top: 6px solid rgba(255, 255, 255, 0.1);
+    padding-top: 30px;
+  }
+  .page h3 {
+    margin: 15px 0;
+  }
+.page:nth-child(2n) {
+  background-color: #FCFCFC;
+}
+
+#menu + .page {
+  padding-top: 50px;
+}
+
+.downloads h2 {
+  margin-bottom: 5px;
+}
+.downloads {
+  float: right;
+}
+.float-left {
+  float: left;
+}
+header {
+  height: 150px;
+}
