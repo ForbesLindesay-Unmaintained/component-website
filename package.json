@@ -1,6 +1,6 @@
 {
   "name": "component",
-  "version": "0.0.1-40",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "node server.js"
