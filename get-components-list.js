@@ -1,6 +1,7 @@
 var Q = require('q');
 var request = Q.nbind(require('request'));
 var markdown = require('./markdown');
+var github = require('./github');
 
 var cache = loadWiki();
 
@@ -28,15 +29,25 @@ function loadWiki() {
         }
         if (depth == 0) {
           data = data.substr(0, i);
-          return data;
         }
       }
-    })
-    .then(function (data) {
       data = splitIntoSections(data, 2);
       data.shift();
       data = splitOutRepositories(data);
-
+      return Q.all(data.map(function (element) {
+        if (element.type != 'component') return element;
+        var user = element.repo.split('/')[0];
+        var repo = element.repo.split('/')[1];
+        return Q.all([github.getComponent(user, repo).fail(function () { return null; }), 
+                      github.getReadme(user, repo).fail(function () { return ''; })])
+          .spread(function (component, readme) {
+            element.component = component;
+            element.readme = readme;
+            return element;
+          });
+      }));
+    })
+    .then(function (data) {
       return data.map(function (element) {
         if (element.type === 'heading') {
           var buf = '';
@@ -46,8 +57,13 @@ function loadWiki() {
           buf += ' ' + element.content;
           return '\n' + buf + '\n';
         } else if (element.type === 'component') {
-          return ' - [' + element.repo + '](/' + element.repo +
+
+          var buf = ' - [' + element.repo + '](/' + element.repo +
               ') - ' + element.description.trim();
+          var md = markdown(element.readme);
+          if (md.travis)
+            buf += ' ' + '[![Build Status](https://secure.travis-ci.org/' + element.repo + '.png)](http://travis-ci.org/' + element.repo + ')';
+          return buf;
         } else {
           throw new Error('Unrecognised element type: ' + element.type);
         }

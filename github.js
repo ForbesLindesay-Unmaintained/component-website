@@ -1,27 +1,69 @@
 var Q = require('q');
 var nbind = Q.nbind;
 
+var path = require('path');
+var join = path.join;
+var fs = require('./fs');
+var makedir = fs.makedir;
+function read(user, repo, name) {
+  var dir = join(__dirname, 'cache', user);
+  if (repo) dir = join(dir, repo);
+  var path = join(dir, name + '.json');
+  return fs.exists(path)
+    .then(function (exists) {
+      if (!exists) return null;
+      else return fs.readFile(path)
+        .then(function (data) {
+          data = JSON.parse(data.toString());
+          if (data.expires && data.expires > Date.now())
+            return data.value;
+          else
+            return null;
+        });
+    });
+}
+function write(user, repo, name, value, expire) {
+  var dir = join(__dirname, 'cache', user);
+  if (repo) dir = join(dir, repo);
+  var path = join(dir, name + '.json');
+  return fs.makedir(dir)
+    .then(function () {
+      return fs.writeFile(path, 
+        JSON.stringify({value: value, expires: Date.now() + expire}));
+    });
+}
+
+function withCache(fn, name, timeInSeconds) {
+  return function (user, repo) {
+    var self = this;
+    var args = arguments;
+    return read(user, repo, name)
+      .then(function (cached) {
+        if (cached) return cached;
+        return fn.apply(self, args)
+          .then(function (data) {
+            return write(user, repo, name, data, timeInSeconds * 1000)
+              .then(function () {
+                return data;
+              });
+          });
+      });
+  };
+}
+
 var clientID = process.env.githubID;//set to github client id
 var clientSecret = process.env.githubSecret;//set to github client secret
 
-var dataCache = {};
-function cache(fn, name) {
-  name = name || '_';
-  dataCache[name] = dataCache[name] || {};
-  var c = dataCache[name];
+function withTokens(fn) {
   return function (path) {
     if (arguments.length == 1 && typeof path == 'string') {
-      //if (c[path]) console.log('serve from cache');
-      if (!c[path]) {
-        setTimeout(function () {
-          delete c[path];
-        }, 120000);//clear cached results after 2 minutes.
-      }
-      return c[path] ? c[path] : c[path] = fn(path + (path.indexOf('?') == -1 ? '?' : '&') + 'client_id=' + clientID + '&client_secret=' + clientSecret);
+      return fn(path + (path.indexOf('?') == -1 ? '?' : '&') + 
+        'client_id=' + clientID + 
+        '&client_secret=' + clientSecret);
     }
   };
 }
-var request = cache(nbind(require('request')));
+var request = withTokens(nbind(require('request')));
 
 function getJson(path) {
   return request(path)
@@ -56,20 +98,20 @@ function parseLink(link) {
   return links;
 }
 
-module.exports.getComponent = getComponent;
+module.exports.getComponent = withCache(getComponent, 'component', 240);
 function getComponent(user, repo) {
   return getJson('https://raw.github.com/' + user + '/' + repo + '/master/component.json');
 }
 
-module.exports.getReadme = getReadme;
+module.exports.getReadme = withCache(getReadme, 'readme', 240);
 function getReadme(user, repo) {
   return getJson('https://api.github.com/repos/' + user + '/' + repo + '/readme').then(function (json) {
-    if (!json) return null;
-    return new Buffer(json.content, 'base64').toString('ascii');
-  });
+      if (!json) return null;
+      return new Buffer(json.content, 'base64').toString('ascii');
+    });
 }
 
-module.exports.getTags = getTags;
+module.exports.getTags = withCache(getTags, 'tags', 240);
 function getTags(user, repo) {
   return getJson('https://api.github.com/repos/' + user + '/' + repo + '/git/refs/tags').then(function (json) {
     if (!json) return null;
@@ -104,15 +146,13 @@ function getTags(user, repo) {
   });
 }
 
-module.exports.getUser = getUser;
+module.exports.getUser = withCache(getUser, 'user', 240);
 function getUser(user) {
   return getJson('https://api.github.com/users/' + user);
 }
 
-module.exports.getUserRepos = getUserRepos;
+module.exports.getUserRepos = withCache(getUserRepos, 'repos', 900);//This is expensive, cache for 15 mins
 function getUserRepos(user) {
-  var get = 0;
-  var got = 0;
   return getJson('https://api.github.com/users/' + user + '/repos?per_page=100')
     .then(function (repos) {
       return Q.all(repos.map(attachComponent))
@@ -130,20 +170,5 @@ function getUserRepos(user) {
       }, function (err) {
         return null; //treat failure to get & parse component.json like non-existant component.json
       });
-  }
-}
-
-function timeout(promise, time) {
-  if (typeof promise.then == 'function') {
-    var def = Q.defer();
-    promise.then(def.resolve, def.reject);
-    setTimeout(function () {
-      def.reject(new Error('Timeout of ' + time + 'ms exceeded'));
-    }, time);
-    return def.promise;
-  } else {
-    return function () {
-      timeout(promise.apply(this, arguments), time);
-    }
   }
 }
