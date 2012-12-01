@@ -63,6 +63,8 @@ function loadWiki() {
           var md = markdown(element.readme);
           if (md.travis)
             buf += ' ' + '[![Build Status](https://secure.travis-ci.org/' + element.repo + '.png)](http://travis-ci.org/' + element.repo + ')';
+          if (element.component && typeof element.component.license == 'string') 
+            buf += ' <span class="license">' + element.component.license + '</span>';
           return buf;
         } else {
           throw new Error('Unrecognised element type: ' + element.type);

@@ -17,6 +17,12 @@ a:hover {
   text-decoration: underline;
 }
 
+.license {
+  background-color: rgb(60, 60, 60);
+  color: white;
+  padding: 0px 10px;
+  border-radius: 5px;
+}
 
 pre code {
   overflow-x: auto;
