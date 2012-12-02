@@ -89,6 +89,7 @@ nav a:hover, #dropdown li:hover {
   text-decoration: none;
 }
 nav a img {
+  margin-right: .5em;
   vertical-align: -.5em;
 }
 
