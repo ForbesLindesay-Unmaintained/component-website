@@ -1,5 +1,5 @@
 var Q = require('q');
-var request = Q.nbind(require('request'));
+var request = Q.nfbind(require('request'));
 var markdown = require('./markdown');
 var github = require('./github');
 

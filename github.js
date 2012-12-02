@@ -1,5 +1,5 @@
 var Q = require('q');
-var nbind = Q.nbind;
+var nfbind = Q.nfbind;
 
 var path = require('path');
 var join = path.join;
@@ -63,7 +63,7 @@ function withTokens(fn) {
     }
   };
 }
-var request = withTokens(nbind(require('request')));
+var request = withTokens(nfbind(require('request')));
 
 function getJson(path) {
   return request(path)

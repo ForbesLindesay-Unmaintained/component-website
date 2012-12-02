@@ -6,7 +6,7 @@ var path = require('path');
 var join = path.join;
 
 var fs = require('fs');
-var mkdir = Q.nbind(fs.mkdir);
+var mkdir = Q.nfbind(fs.mkdir);
 var exists = function (path) {
   var def = Q.defer();
   fs.exists(path, def.resolve);
@@ -26,7 +26,7 @@ function build(dir, name) {
     .then(function () {
       var builder = new Builder(dir);
       builder.paths = [join(dir, 'components')];
-      return Q.nbind(builder.build, builder)();
+      return Q.nfbind(builder.build.bind(builder))();
     })
     .then(function (obj) {
       var outstanding = 2;

@@ -3,7 +3,7 @@ var Q = require('q');
 var request = require('request');
 
 var fs = require('fs');
-var mkdir = Q.nbind(fs.mkdir);
+var mkdir = Q.nfbind(fs.mkdir);
 var exists = function (path) {
   var def = Q.defer();
   fs.exists(path, def.resolve);
@@ -66,7 +66,7 @@ function downloadFile(src, destination) {
 }
 
 function readJSON(file) {
-  return Q.nbind(fs.readFile, fs)(file)
+  return Q.nfbind(fs.readFile)(file)
     .then(function (contents) {
       return JSON.parse(contents);
     });

@@ -3,14 +3,14 @@ var fs = require('fs');
 var path = require('path');
 var join = path.join;
 
-var mkdir = Q.nbind(fs.mkdir);
-var rmdir = Q.nbind(fs.rmdir);
-var unlink = Q.nbind(fs.unlink);
-var readdir = Q.nbind(fs.readdir);
-var stat = Q.nbind(fs.stat);
+var mkdir = Q.nfbind(fs.mkdir);
+var rmdir = Q.nfbind(fs.rmdir);
+var unlink = Q.nfbind(fs.unlink);
+var readdir = Q.nfbind(fs.readdir);
+var stat = Q.nfbind(fs.stat);
 
-var readFile = Q.nbind(fs.readFile);
-var writeFile = Q.nbind(fs.writeFile);
+var readFile = Q.nfbind(fs.readFile);
+var writeFile = Q.nfbind(fs.writeFile);
 var exists = function (path) {
   var def = Q.defer();
   fs.exists(path, def.resolve);

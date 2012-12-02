@@ -1,6 +1,6 @@
 require('../server');
 var Q = require('q');
-var request = Q.nbind(require('request'));
+var request = Q.nfbind(require('request'));
 var expect = require('expect.js');
 
 function get(url, fn) {
@@ -17,9 +17,9 @@ function get(url, fn) {
 }
 get('/ForbesLindesay/ajax');
 get('/ForbesLindesay/ajax/download');
-get('/ForbesLindesay/ajax/download/ajax-dev.js');
-get('/ForbesLindesay/ajax/download/ajax-dev.min.js');
 get('/ForbesLindesay/ajax/download/latest.js');
 get('/ForbesLindesay/ajax/download/latest.min.js');
+get('/ForbesLindesay/ajax/download/ajax-dev.js');
+get('/ForbesLindesay/ajax/download/ajax-dev.min.js');
 get('/ForbesLindesay');
 get('/');
