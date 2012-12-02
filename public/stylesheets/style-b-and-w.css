@@ -44,8 +44,8 @@ h1, h2, h3, h4 {
 }
 
 header {
-  padding-top: 150px;
-  padding-bottom: 20px;
+  padding-top: 40px;
+  padding-bottom: 40px;
   background-color: white;
 }
 .avatarImage {
@@ -153,6 +153,16 @@ nav a:hover, #dropdown li:hover {
 .float-left {
   float: left;
 }
-header {
-  height: 150px;
+
+/* nib's clearfix */
+.clearfix {
+  zoom: 1;
+}
+.clearfix:before,
+.clearfix:after {
+  content: "";
+  display: table;
+}
+.clearfix:after {
+  clear: both;
 }
