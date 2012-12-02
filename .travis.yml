@@ -1,3 +1,5 @@
 language: node_js
 node_js:
   - 0.8
+env:
+  - githubID="18dc6ef282c41daa53d7" githubSecret="164d13f3187a3e442016e441b62b518bc7a74b16"
