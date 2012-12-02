@@ -3,7 +3,8 @@
   "version": "1.1.0",
   "private": true,
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "mocha -R spec -t 20000"
   },
   "dependencies": {
     "express": "~3",
@@ -15,6 +16,10 @@
     "highlight.js": "~7",
     "uglify-js2": "~2",
     "component-builder": "~0.4"
+  },
+  "devDependencies": {
+    "expect.js": "*",
+    "mocha": "*"
   },
   "subdomain": "component",
   "engines": {
