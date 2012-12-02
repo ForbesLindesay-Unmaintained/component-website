@@ -63,8 +63,7 @@ header {
   color: transparent; /* keep ie happy */
 }
 
-#menu {
-  position: absolute;
+.menu {
   width: 100%;
   z-index: 3;
   clear: both;
@@ -90,13 +89,13 @@ nav a:hover, #dropdown li:hover {
   text-decoration: none;
 }
 
-#menu.fixed-top {
+.menu.fixed-top {
   position: fixed;
   top: 0;
   background-color: rgba(255, 255, 255, 0.6);
   border-top: 0px;
 }
-#menu.fixed-top:hover {
+.menu.fixed-top:hover {
   background-color: white;
 }
 
@@ -140,7 +139,7 @@ nav a:hover, #dropdown li:hover {
   background-color: #FCFCFC;
 }
 
-#menu + .page {
+.menu + .page {
   padding-top: 50px;
 }
 
