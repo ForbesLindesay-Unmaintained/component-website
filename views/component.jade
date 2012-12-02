@@ -18,13 +18,13 @@ block content
         br
         a(href='/' + username + '/' + title + '/download') All Versions
   if headings.width < 970
-    section#menu.fix-when-top
+    section.menu.fix-when-top
       div.content
         nav
           each heading in headings
             a(href="#" + heading.id)= heading.text
   else
-    section#menu
+    section.menu
       div.content
         nav
     section.page
