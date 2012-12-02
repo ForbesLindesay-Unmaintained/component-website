@@ -88,6 +88,9 @@ nav a:hover, #dropdown li:hover {
   color: white;
   text-decoration: none;
 }
+nav a img {
+  vertical-align: -.5em;
+}
 
 .menu.fixed-top {
   position: fixed;
