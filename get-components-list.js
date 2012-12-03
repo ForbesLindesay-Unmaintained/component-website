@@ -60,11 +60,19 @@ function loadWiki() {
 
           var buf = ' - [' + element.repo + '](/' + element.repo +
               ') - ' + element.description.trim();
-          var md = markdown(element.readme);
-          if (md.travis)
-            buf += ' ' + '[![Build Status](https://secure.travis-ci.org/' + element.repo + '.png)](http://travis-ci.org/' + element.repo + ')';
-          if (element.component && typeof element.component.license == 'string') 
-            buf += ' <span class="license">' + element.component.license + '</span>';
+          if (element.readme) {
+            var md = markdown(element.readme);
+            if (md.travis)
+              buf += ' ' + '[![Build Status](https://secure.travis-ci.org/' + element.repo + '.png)](http://travis-ci.org/' + element.repo + ')';
+          } else {
+            buf += ' <span style="color: red;">Missing readme</span>';
+          }
+          if (element.component) {
+            if (typeof element.component.license == 'string') 
+              buf += ' <span class="license">' + element.component.license + '</span>';
+          } else {
+            buf += ' <span style="color: red;">Missing component.json</span>';
+          }
           return buf;
         } else {
           throw new Error('Unrecognised element type: ' + element.type);
