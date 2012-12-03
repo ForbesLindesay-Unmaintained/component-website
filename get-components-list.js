@@ -4,6 +4,7 @@ var markdown = require('./markdown');
 var github = require('./github');
 
 var cache = loadWiki();
+var count = 0;
 
 setInterval(function () {
   var next = loadWiki();
@@ -34,6 +35,7 @@ function loadWiki() {
       data = splitIntoSections(data, 2);
       data.shift();
       data = splitOutRepositories(data);
+      count = data.length;
       return Q.all(data.map(function (element) {
         if (element.type != 'component') return element;
         var user = element.repo.split('/')[0];
@@ -72,7 +74,9 @@ function loadWiki() {
       }).join('\n');
     })
     .then(function (markdownSrc) {
-      return markdown(markdownSrc);
+      var parsed = markdown(markdownSrc);
+      parsed.count = count;
+      return parsed;
     });
 }
 
