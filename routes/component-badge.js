@@ -4,6 +4,10 @@ var badge = require("component-badge");
 
 module.exports = route;
 function route(req, res, next) {
-  res.type('svg');
-  res.send(badge(10), { scale: 0.5 });
+  listing()
+    .then(function (listing) {
+      res.type('svg');
+      res.send(badge(listing.count), { scale: 0.5 });
+    })
+    .done(null, next);
 }
