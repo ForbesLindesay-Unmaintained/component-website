@@ -18,6 +18,15 @@ app.configure(function(){
 app.configure('development', function(){
   app.use(express.errorHandler());
 });
+app.configure('production', function(){
+  app.use(function (err, req, res, next) {
+    if (err && err.message) {
+      res.send(500, err.message);
+    } else {
+      next(err);
+    }
+  });
+});
 
 app.get('/', require('./routes/index'));
 app.get('/:user', require('./routes/user'));

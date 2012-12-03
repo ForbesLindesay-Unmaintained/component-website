@@ -13,6 +13,7 @@ var exists = function (path) {
 var path = require('path');
 var join = path.join;
 var dirname = path.dirname;
+var basename = path.basename;
 
 var clientID = process.env.githubID;//set to github client id
 var clientSecret = process.env.githubSecret;//set to github client secret
@@ -60,6 +61,12 @@ function downloadFile(src, destination) {
       });
 
       web.pipe(file);
+      web.on('response', function (res) {
+        var status = res.statusCode;
+        if (status === 404) def.reject(new Error('404 Not Found: ' + src));
+        else if (status >= 400 && status < 500) def.reject(new Error(status + ' unknown client error requesting ' + src));
+        else if (status >= 500 && status < 600) def.reject(new Error(status + ' unknown server error requesting ' + src));
+      });
 
       return def.promise;
     });
@@ -68,7 +75,11 @@ function downloadFile(src, destination) {
 function readJSON(file) {
   return Q.nfbind(fs.readFile)(file)
     .then(function (contents) {
-      return JSON.parse(contents);
+      try {
+        return JSON.parse(contents);
+      } catch (ex) {
+        throw new Error('Invalid JSON in ' + basename(file));
+      }
     });
 }
 

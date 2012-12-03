@@ -71,7 +71,7 @@ function getJson(path) {
       if (res.statusCode == 404) {
         return null;
       } else if (res.statusCode != 200) {
-        throw new Error('Server responded with error code: ' + res.statusCode + '\n' + body);
+        throw new Error('GitHub server responded with error code: ' + res.statusCode + '\n' + body);
       } else {
         var result = JSON.parse(body);
         if (res.headers.link) {
