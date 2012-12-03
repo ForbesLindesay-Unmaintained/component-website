@@ -7,6 +7,7 @@ module.exports = route;
 function route(req, res, next) {
   getUserCached(req.params.user)
     .then(function (user) {
+      if (user == null) return next();
       res.render('user', user);
     }).done(null, next);
 }
@@ -41,6 +42,7 @@ function getUserCached(user) {
 function getUser(user) {
   return Q.all([github.getUser(user), github.getUserRepos(user)])
     .spread(function (user, repos) {
+      if (user === null && repos == null) return null;
       repos = repos.map(function (repo) {
         return {
           name: repo.github.full_name,

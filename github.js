@@ -155,6 +155,7 @@ module.exports.getUserRepos = withCache(getUserRepos, 'repos', 900);//This is ex
 function getUserRepos(user) {
   return getJson('https://api.github.com/users/' + user + '/repos?per_page=100')
     .then(function (repos) {
+      if (repos == null) return null;
       return Q.all(repos.map(attachComponent))
         .then(function (repos) {
           return repos.filter(function (repo) {

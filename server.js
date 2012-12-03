@@ -13,7 +13,6 @@ app.configure(function(){
   app.use(express.favicon(path.join(__dirname, 'public', 'favicon.ico')));
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(app.router);
-  // app.plugin(redirect(require('express-redirect'))); // https://github.com/visionmedia/express/pull/1438
   require('express-redirect').apply(app);
 });
 
@@ -30,7 +29,11 @@ app.configure('production', function(){
   });
 });
 
+//static routes
 app.get('/', require('./routes/index'));
+app.get('/component-badge.svg', require('./routes/component-badge'));
+
+//dynamic routes
 app.get('/:user', require('./routes/user'));
 app.get('/:user/:repo', require('./routes/repo'));
 app.redirect('/refer/:repo/:user', '/:repo/:user'); // should be 301, but may change in the future
@@ -43,7 +46,6 @@ app.get('/:user/:repo/download/latest.min.js', require('./routes/latest')(true))
 app.get('/:user/:repo/download/:file.js', require('./routes/download-standalone'));
 
 app.redirect('/:user/:repo/component-badge.svg', '/component-badge.svg');
-app.get('/component-badge.svg', require('./routes/component-badge'));
 
 
 http.createServer(app).listen(app.get('port'), function(){
