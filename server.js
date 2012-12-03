@@ -33,7 +33,7 @@ app.get('/:user/:repo/download/latest.min.js', require('./routes/latest')(true))
 
 app.get('/:user/:repo/download/:file.js', require('./routes/download-standalone'));
 
-app.redirect('/:repo/:user/component-badge.svg', '/component-badge.svg');
+app.redirect('/:user/:repo/component-badge.svg', '/component-badge.svg');
 app.get('/component-badge.svg', require('./routes/component-badge'));
 
 
