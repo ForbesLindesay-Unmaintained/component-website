@@ -1,7 +1,6 @@
 var remote = 'https://raw.github.com';
 
 var express = require('express');
-var redirect = require('express-redirect');
 var http = require('http');
 var path = require('path');
 
@@ -14,17 +13,13 @@ app.configure(function(){
   app.use(express.favicon(path.join(__dirname, 'public', 'favicon.ico')));
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(app.router);
+  // app.plugin(redirect(require('express-redirect'))); // https://github.com/visionmedia/express/pull/1438
+  require('express-redirect')(app);
 });
 
 app.configure('development', function(){
   app.use(express.errorHandler());
 });
-
-function redirect(target) {
-	return function redirection(req, res, next) {
-
-	};
-}
 
 app.get('/', require('./routes/index'));
 app.get('/:user', require('./routes/user'));
