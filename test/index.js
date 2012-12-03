@@ -22,4 +22,5 @@ get('/ForbesLindesay/ajax/download/latest.min.js');
 get('/ForbesLindesay/ajax/download/ajax-dev.js');
 get('/ForbesLindesay/ajax/download/ajax-dev.min.js');
 get('/ForbesLindesay');
+get('/component-badge.svg')
 get('/');

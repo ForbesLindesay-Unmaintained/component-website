@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "express": "~3",
+    "express-redirect": "~0.0",
     "jade": "~0.27",
     "request": "~2",
     "marked": "~0.2",
@@ -15,7 +16,8 @@
     "component": "~0.9",
     "highlight.js": "~7",
     "uglify-js2": "~2",
-    "component-builder": "~0.4"
+    "component-builder": "~0.4",
+    "component-badge": "~1.1"
   },
   "devDependencies": {
     "expect.js": "*",
