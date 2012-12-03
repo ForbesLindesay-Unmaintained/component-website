@@ -16,7 +16,7 @@
     "component": "~0.9",
     "highlight.js": "~7",
     "uglify-js2": "~2",
-    "component-builder": "~0.4"
+    "component-builder": "~0.4",
     "component-badge": "~1.1"
   },
   "devDependencies": {
