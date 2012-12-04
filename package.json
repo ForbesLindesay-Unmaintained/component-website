@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "express": "~3",
-    "express-redirect": "~0.0",
+    "express-redirect": "~1.0",
     "jade": "~0.27",
     "request": "~2",
     "marked": "~0.2",

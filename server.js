@@ -13,7 +13,7 @@ app.configure(function(){
   app.use(express.favicon(path.join(__dirname, 'public', 'favicon.ico')));
   app.use(express.static(path.join(__dirname, 'public')));
   app.use(app.router);
-  require('express-redirect').apply(app);
+  require('express-redirect')(app);
 });
 
 app.configure('development', function(){
