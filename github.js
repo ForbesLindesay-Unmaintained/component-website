@@ -38,6 +38,7 @@ function withCache(fn, name, timeInSeconds) {
     var self = this;
     var args = arguments;
     return read(user, repo, name)
+      .fail(function () { return null; })
       .then(function (cached) {
         if (cached) return cached;
         return fn.apply(self, args)
