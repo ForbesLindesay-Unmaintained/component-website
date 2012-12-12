@@ -32,7 +32,10 @@ function minifyComponent(user, repo, version) {
   var dir = join(__dirname, '..', 'cache', user, repo, version);
   return readFile(join(dir, 'build', 'build.js'))
     .then(function (built) {
-      return writeFile(join(dir, 'build', 'build.min.js'), UglifyJS.minify(built.toString(), {fromString: true}).code);
+      return writeFile(
+        join(dir, 'build', 'build.min.js'), 
+        UglifyJS.minify(built.toString(), {fromString: true}).code
+      );
     });
 }
 
@@ -46,8 +49,6 @@ function route(req, res, next) {
   var file = req.params.file;
   var min = /\.min$/.test(file);
   if (min) file = file.substring(0, file.length - 4);
-  var pack = /\.component$/.test(file)
-  if (pack) file = file.substring(0, file.length - '.component'.length)
 
   var match = /^(.*)\-([^\-]*)$/.exec(file);
   if (!match) return next();
@@ -79,7 +80,7 @@ function route(req, res, next) {
           return makedir(dir);
         })
         .then(function (isNew) {
-          if (true) {
+          if (isNew) {
             return installComponent(user, repo, version)
               .then(function () {
                 return buildComponent(user, repo, version);
@@ -95,12 +96,11 @@ function route(req, res, next) {
     });
 
     return build.then(function () {
-      debugger;
       res.sendfile(
         join(
           dir, 
           'build', 
-          'build' + ((pack ? '.component' : '') + (min ? '.min' : '')) + '.js'
+          'build' + (min ? '.min' : '') + '.js'
         ), 
         {maxAge: 0}
       )

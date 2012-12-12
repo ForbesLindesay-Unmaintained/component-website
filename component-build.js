@@ -29,27 +29,11 @@ function build(dir, name) {
       return Q.nfbind(builder.build.bind(builder))();
     })
     .then(function (obj) {
-      var outstanding = 3;
       var def = Q.defer();
-      function complete() {
-        if (--outstanding === 0) {
-          def.resolve();
-        }
-      }
-
       var js = fs.createWriteStream(path.join(dir, 'build', 'build.js'));
-      var css = fs.createWriteStream(path.join(dir, 'build', 'build.css'));
-      var both = fs.createWriteStream(path.join(dir, 'build', 'build.component.js'));
       
       js.on('error', def.reject);
-      css.on('error', def.reject);
-      both.on('error', def.reject);
-      js.on('close', complete);
-      css.on('close', complete);
-      both.on('close', complete);
-
-      css.write(obj.css);
-      css.end();
+      js.on('close', def.resolve);
 
       var lib = 'require("' + name + '")';
       var umd =
@@ -66,19 +50,14 @@ function build(dir, name) {
       js.write(';(function(){\n');
       js.write(obj.require);
       js.write(obj.js);
+      if (obj.css) {
+        js.write('var style = document.createElement(\'style\')\n')
+        js.write('style.appendChild(document.createTextNode('+JSON.stringify(obj.css)+'))\n')
+        js.write('document.getElementsByTagName(\'head\')[0].appendChild(style)\n')
+      }
       js.write(umd)
       js.write('}())');
       js.end();
-
-      both.write(';(function(){\n')
-      both.write(obj.require);
-      both.write(obj.js)
-      both.write('var style = document.createElement(\'style\')\n')
-      both.write('style.appendChild(document.createTextNode('+JSON.stringify(obj.css)+'))\n')
-      both.write('document.getElementsByTagName(\'head\')[0].appendChild(style)\n')
-      both.write(umd)
-      both.write('}())')
-      both.end()
 
       return def.promise;
     });
