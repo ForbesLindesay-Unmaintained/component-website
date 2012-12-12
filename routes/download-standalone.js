@@ -44,9 +44,10 @@ function route(req, res, next) {
   var user = req.params.user;
   var repo = req.params.repo;
   var file = req.params.file;
-
   var min = /\.min$/.test(file);
   if (min) file = file.substring(0, file.length - 4);
+  var pack = /\.component$/.test(file)
+  if (pack) file = file.substring(0, file.length - '.component'.length)
 
   var match = /^(.*)\-([^\-]*)$/.exec(file);
   if (!match) return next();
@@ -78,7 +79,7 @@ function route(req, res, next) {
           return makedir(dir);
         })
         .then(function (isNew) {
-          if (isNew) {
+          if (true) {
             return installComponent(user, repo, version)
               .then(function () {
                 return buildComponent(user, repo, version);
@@ -88,14 +89,22 @@ function route(req, res, next) {
               });
           }
         });
-      }, function reset(err) {
-        if (err || version == 'dev')
-          return removedir(dir);
-      });
+    }, function reset(err) {
+      if (err || version == 'dev')
+        return removedir(dir);
+    });
 
     return build.then(function () {
-        res.sendfile(join(dir, 'build', 'build' + (min?'.min':'')+ '.js'), {maxAge: 0});
-      })
+      debugger;
+      res.sendfile(
+        join(
+          dir, 
+          'build', 
+          'build' + ((pack ? '.component' : '') + (min ? '.min' : '')) + '.js'
+        ), 
+        {maxAge: 0}
+      )
+    })
 
   }).done(null, next);
 }

@@ -29,40 +29,56 @@ function build(dir, name) {
       return Q.nfbind(builder.build.bind(builder))();
     })
     .then(function (obj) {
-      var outstanding = 2;
+      var outstanding = 3;
       var def = Q.defer();
       function complete() {
-        if (--outstanding == 0) {
+        if (--outstanding === 0) {
           def.resolve();
         }
       }
 
       var js = fs.createWriteStream(path.join(dir, 'build', 'build.js'));
       var css = fs.createWriteStream(path.join(dir, 'build', 'build.css'));
+      var both = fs.createWriteStream(path.join(dir, 'build', 'build.component.js'));
       
       js.on('error', def.reject);
       css.on('error', def.reject);
+      both.on('error', def.reject);
       js.on('close', complete);
       css.on('close', complete);
+      both.on('close', complete);
 
       css.write(obj.css);
       css.end();
 
+      var lib = 'require("' + name + '")';
+      var umd =
+        'if (typeof module != "undefined" && typeof module.exports != "undefined") {\n'
+        +'  module.exports = ' + lib + '\n'
+        +'} else if (typeof define == "function") {\n'
+        +'  define("' + name + '", [], function () {\n'
+        +'    return ' + lib + '\n'
+        +'  });'
+        +'} else {\n'
+        +'  window.' + camelCase(name) + ' = ' + lib + '\n'
+        +'}\n'
+
       js.write(';(function(){\n');
       js.write(obj.require);
       js.write(obj.js);
-      var lib = 'require("' + name + '")';
-      js.write('if (typeof module != "undefined" && typeof module.exports != "undefined") {\n');
-      js.write('  module.exports = ' + lib + '\n');
-      js.write('} else if (typeof define == "function") {\n');
-      js.write('  define("' + name + '", [], function () {\n');
-      js.write('    return ' + lib + '\n');
-      js.write('  });')
-      js.write('} else {\n');
-      js.write('  window.' + camelCase(name) + ' = ' + lib + '\n');
-      js.write('}\n');
+      js.write(umd)
       js.write('}())');
       js.end();
+
+      both.write(';(function(){\n')
+      both.write(obj.require);
+      both.write(obj.js)
+      both.write('var style = document.createElement(\'style\')\n')
+      both.write('style.appendChild(document.createTextNode('+JSON.stringify(obj.css)+'))\n')
+      both.write('document.getElementsByTagName(\'head\')[0].appendChild(style)\n')
+      both.write(umd)
+      both.write('}())')
+      both.end()
 
       return def.promise;
     });
