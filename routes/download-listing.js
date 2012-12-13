@@ -25,8 +25,7 @@ function route(req, res, next) {
           return {
             version: tag.version,
             download: '/'+user+'/'+repo+'/download/'+name+'-'+tag.version+'.js',
-            downloadMin: '/'+ user+'/'+repo+'/download/'+name+'-'+tag.version+'.min.js',
-            package: '/'+user+'/'+repo+'/download/'+name+'-'+tag.version+'.component.js'
+            downloadMin: '/'+ user+'/'+repo+'/download/'+name+'-'+tag.version+'.min.js'
           }
         }) : []
       })
