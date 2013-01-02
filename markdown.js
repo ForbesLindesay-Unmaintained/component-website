@@ -110,7 +110,7 @@ function parse(markdown) {
     return heading.text.length * 13 + 30 + 4;//text width + margin + border
   }).reduce(function (a, b) {
     return a + b;
-  });
+  }, 0);
 
   return {html: html, headings: headings, travis: travis};
 }
