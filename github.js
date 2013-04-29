@@ -64,7 +64,7 @@ function withTokens(fn) {
     }
   };
 }
-var request = withTokens(nfbind(require('request')));
+var request = withTokens(nfbind(require('request').defaults({headers:{'user-agent':'ForbesLindesay/component-website'}})));
 
 function getJson(path) {
   return request(path)
