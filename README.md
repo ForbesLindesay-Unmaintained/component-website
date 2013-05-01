@@ -1,6 +1,13 @@
 component-website
 =================
 
+This project has now become inactive. The shiny new website is up on [component.io](http://component.io).
+Its GitHub repo is [component/component.io](https://github.com/component/component.io). If you have any great ideas or
+issues please put them there. :)
+
+Old Readme
+----------
+
 The component website, currently available to view at https://component.jit.su and hopefully will be at http://component.io once it's finished.
 
 The website serves 2 key purposes:
