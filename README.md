@@ -1,6 +1,8 @@
 component-website
 =================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/ForbesLindesay/component-website.svg)](https://greenkeeper.io/)
+
 This project has now become inactive. The shiny new website is up on [component.io](http://component.io).
 Its GitHub repo is [component/component.io](https://github.com/component/component.io). If you have any great ideas or
 issues please put them there. :)
