@@ -7,17 +7,17 @@
     "test": "mocha -R spec -t 30000"
   },
   "dependencies": {
-    "express": "~3",
-    "express-redirect": "~1.0",
-    "jade": "~0.27",
+    "express": "~4.14.1",
+    "express-redirect": "~1.2.2",
+    "jade": "~1.11.0",
     "request": "~2",
-    "marked": "~0.2",
-    "q": "~0.8",
-    "component": "~0.9",
-    "highlight.js": "~7",
+    "marked": "~0.3.6",
+    "q": "~1.4.1",
+    "component": "~1.1.0",
+    "highlight.js": "~9.9.0",
     "uglify-js2": "~2",
-    "component-builder": "~0.4",
-    "component-badge": "~1.1"
+    "component-builder": "~1.2.1",
+    "component-badge": "~1.2.0"
   },
   "devDependencies": {
     "expect.js": "*",
