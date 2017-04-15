@@ -21,10 +21,11 @@ function route(req, res, next) {
           downloadMin: '/' + user + '/' + repo + '/download/' + component.name.replace('.js', '') + '-dev.min.js'
         },
         versions: tags ? tags.map(function (tag) {
+          var name = component.name.replace(/\.js$/, '')
           return {
             version: tag.version,
-            download: '/' + user + '/' + repo + '/download/' + component.name.replace('.js', '') + '-' + tag.version + '.js',
-            downloadMin: '/' + user + '/' + repo + '/download/' + component.name.replace('.js', '') + '-' + tag.version + '.min.js'
+            download: '/'+user+'/'+repo+'/download/'+name+'-'+tag.version+'.js',
+            downloadMin: '/'+ user+'/'+repo+'/download/'+name+'-'+tag.version+'.min.js'
           }
         }) : []
       })

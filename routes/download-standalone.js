@@ -32,7 +32,10 @@ function minifyComponent(user, repo, version) {
   var dir = join(__dirname, '..', 'cache', user, repo, version);
   return readFile(join(dir, 'build', 'build.js'))
     .then(function (built) {
-      return writeFile(join(dir, 'build', 'build.min.js'), UglifyJS.minify(built.toString(), {fromString: true}).code);
+      return writeFile(
+        join(dir, 'build', 'build.min.js'), 
+        UglifyJS.minify(built.toString(), {fromString: true}).code
+      );
     });
 }
 
@@ -44,7 +47,6 @@ function route(req, res, next) {
   var user = req.params.user;
   var repo = req.params.repo;
   var file = req.params.file;
-
   var min = /\.min$/.test(file);
   if (min) file = file.substring(0, file.length - 4);
 
@@ -88,14 +90,21 @@ function route(req, res, next) {
               });
           }
         });
-      }, function reset(err) {
-        if (err || version == 'dev')
-          return removedir(dir);
-      });
+    }, function reset(err) {
+      if (err || version == 'dev')
+        return removedir(dir);
+    });
 
     return build.then(function () {
-        res.sendfile(join(dir, 'build', 'build' + (min?'.min':'')+ '.js'), {maxAge: 0});
-      })
+      res.sendfile(
+        join(
+          dir, 
+          'build', 
+          'build' + (min ? '.min' : '') + '.js'
+        ), 
+        {maxAge: 0}
+      )
+    })
 
   }).done(null, next);
 }
